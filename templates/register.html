@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-section d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="dashboard-card" data-aos="zoom-in">
+                    <div class="text-center mb-5">
+                        <h2 class="text-white mb-1"><i class="bi bi-person-plus"></i> Create Account</h2>
+                        <p class="text-white-50">Start your 14-day free trial</p>
+                    </div>
+                    
+                    <form method="POST">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="text" 
+                                           class="form-control bg-transparent text-white" 
+                                           name="full_name" 
+                                           required 
+                                           placeholder=" ">
+                                    <label class="text-white-50"><i class="bi bi-person me-2"></i>Full Name</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="email" 
+                                           class="form-control bg-transparent text-white" 
+                                           name="email" 
+                                           required 
+                                           placeholder=" ">
+                                    <label class="text-white-50"><i class="bi bi-envelope me-2"></i>Email Address</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="tel" 
+                                           class="form-control bg-transparent text-white" 
+                                           name="mobile" 
+                                           required 
+                                           placeholder=" ">
+                                    <label class="text-white-50"><i class="bi bi-phone me-2"></i>Mobile Number</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="password" 
+                                           class="form-control bg-transparent text-white" 
+                                           name="password" 
+                                           required 
+                                           placeholder=" ">
+                                    <label class="text-white-50"><i class="bi bi-lock me-2"></i>Password</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="password" 
+                                           class="form-control bg-transparent text-white" 
+                                           name="confirm_password" 
+                                           required 
+                                           placeholder=" ">
+                                    <label class="text-white-50"><i class="bi bi-shield-lock me-2"></i>Confirm Password</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="{{ url_for('main.terms') }}" target="_blank">Terms of Service</a> and 
+                                    <a href="{{ url_for('main.privacy') }}" target="_blank">Privacy Policy</a>
+                                </label>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" 
+                                        class="btn btn-gradient w-100 py-3 fw-bold">
+                                    <i class="bi bi-person-add me-2"></i>Create Account
+                                </button>
+                            </div>
+
+                            <div class="col-12 text-center mt-4">
+                                <p class="text-white-50 mb-0">
+                                    Already registered? 
+                                    <a href="{{ url_for('auth.login') }}" class="text-gradient-primary text-decoration-none">
+                                        Sign in here
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 d-flex flex-column" style="margin-top: 50px;">
+    <div class="row flex-grow-1">
+        {% if not view_mode %}
+        <div class="col-md-3 glass-panel border-end p-4">
+            <div class="sticky-top" style="top: 1rem">
+
+
+                <div class="card glass-card mb-4 sticky" >
+                    <div class="card-header bg-gradient-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-download me-2"></i>Export</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-glass text-start" onclick="handleExport('pdf')">
+                                <i class="bi bi-file-pdf me-2"></i>PDF Document
+                            </button>
+                            <button class="btn btn-glass text-start" onclick="handleExport('docx')">
+                                <i class="bi bi-file-word me-2"></i>Word Document
+                            </button>
+                            <button class="btn btn-glass text-start" onclick="handleExport('md')">
+                                <i class="bi bi-markdown me-2"></i>Markdown
+                            </button>
+                            <button class="btn btn-glass text-start" onclick="generateQR()">
+                                <i class="bi bi-qr-code me-2"></i>QR Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card glass-card">
+                    <div class="card-header bg-gradient-warning text-white">
+                        <h5 class="mb-0"><i class="bi bi-share me-2"></i>Share</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-transparent text-white" id="shareLink" 
+                                value="{{ url_for('plans.view_plan', plan_id=plan_id, view_key=plan.view_key, _external=True) }}" readonly>
+                            <button class="btn btn-glass" onclick="copyLink()">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="{% if not view_mode %}col-md-9{% else %}col-12{% endif %} p-4">
+            <div id="editorContent" class="theme-{{ plan.theme }} glass-card rounded-3 p-4">
+                {% if plan.logo %}
+                <div class="text-center mb-5 mt-3">
+                    <img src="{{ url_for('static', filename='uploads/' + plan.logo) }}" 
+                         class="logo-preview shadow-sm" style="max-height: 120px">
+                </div>
+                {% endif %}
+                
+                <div id="editableContent" 
+                    {% if not view_mode %}contenteditable="true"{% endif %}
+                    class="editable-area p-4"
+                    {% if not view_mode %}data-oninput="autoSave()"{% endif %}>
+                    {{ plan.html_content|safe }}
+                </div>
+
+                <div class="ai-tools-section p-4">
+                    <div class="card glass-card mb-4">
+                        <div class="card-header bg-gradient-primary text-white d-flex align-items-center">
+                            <div class="icon-wrapper bg-white p-2 rounded me-3">
+                                <i class="bi bi-search text-primary fs-4"></i>
+                            </div>
+                            <h3 class="mb-0">🔍 AI Market Research</h3>
+                        </div>
+                        <div class="card-body">
+                            {{ plan.market_research|markdown|safe }}
+                        </div>
+                    </div>
+
+                    <div class="card glass-card mb-4">
+                        <div class="card-header bg-gradient-success text-white d-flex align-items-center">
+                            <div class="icon-wrapper bg-white p-2 rounded me-3">
+                                <i class="bi bi-cpu text-success fs-4"></i>
+                            </div>
+                            <h3 class="mb-0">⚙️ AI Tech Stack</h3>
+                        </div>
+                        <div class="card-body">
+                            {{ plan.tech_stack|markdown|safe }}
+                        </div>
+                    </div>
+                    <div class="card glass-card">
+                        <div class="card-header bg-gradient-info text-white d-flex align-items-center">
+                            <div class="icon-wrapper bg-white p-2 rounded me-3">
+                                <i class="bi bi-graph-up text-info fs-4"></i>
+                            </div>
+                            <h3 class="mb-0">💰 AI Revenue Models</h3>
+                        </div>
+                        <div class="card-body">
+                            {{ plan.revenue_models|markdown|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not view_mode %}
+<script>
+let saveTimeout;
+const planId = "{{ plan_id }}";
+
+function autoSave() {
+    const contentElement = document.getElementById('editableContent');
+    const content = contentElement.innerHTML;
+    
+    const cleanContent = content
+        .replace(/contenteditable="true"/g, '')
+        .replace(/<span[^>]*>(&nbsp;|\s)*<\/span>/g, '')
+        .replace(/data-oninput="[^"]*"/g, '');
+
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        fetch(`/plan/${planId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `content=${encodeURIComponent(cleanContent)}`
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Save failed');
+            console.log('Auto-save successful');
+        })
+        .catch(error => {
+            console.error('Auto-save error:', error);
+            showToast('Error saving document', 'danger');
+        });
+    }, 3000);
+}
+
+function handleExport(format) {
+    showToast(`Generating ${format.toUpperCase()}...`, 'info');
+    const exportUrl = `/export/${planId}/${format}?view_key={{ plan.view_key }}`;
+    
+    if (format === 'pdf' || format === 'docx') {
+        window.open(exportUrl, '_blank');
+    } 
+    else if (format === 'md') {
+        const link = document.createElement('a');
+        link.href = exportUrl;
+        link.download = `business_plan.${format}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+function generateQR() {
+    showToast('Generating QR Code...', 'info');
+    const qrUrl = `/export/${planId}/qr?view_key={{ plan.view_key }}`;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card">
+                <div class="modal-header">
+                    <h5 class="modal-title">Shareable QR Code</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="${qrUrl}" class="img-fluid" style="max-width: 300px;">
+                    <div class="mt-3">
+                        <button class="btn btn-glass" onclick="downloadQR()">
+                            <i class="bi bi-download me-2"></i>Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    new bootstrap.Modal(modal).show();
+}
+
+function downloadQR() {
+    const link = document.createElement('a');
+    link.href = `/export/${planId}/qr?view_key={{ plan.view_key }}`;
+    link.download = 'business-plan-qr.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function copyLink() {
+    const linkInput = document.getElementById('shareLink');
+    navigator.clipboard.writeText(linkInput.value)
+        .then(() => showToast('Link copied to clipboard!', 'success'))
+        .catch(() => showToast('Failed to copy link', 'danger'));
+}
+
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    new bootstrap.Toast(toast, { autohide: true, delay: 3000 }).show();
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    container.style.zIndex = 9999;
+    document.body.appendChild(container);
+    return container;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('themeSelect').value = "{{ plan.theme }}";
+});
+</script>
+{% endif %}
+
+<style>
+.glass-panel {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.editable-area {
+    min-height: 60vh;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.editable-area:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+@media (max-width: 768px) {
+    .glass-panel {
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    
+    .editable-area {
+        min-height: 50vh;
+        padding: 1.25rem !important;
+        font-size: 1rem;
+    }
+    
+    .logo-preview {
+        max-height: 80px !important;
+    }
+    
+    .card-header h3 {
+        font-size: 1.15rem;
+    }
+}
+
+.theme-business .editable-area {
+    font-family: 'Times New Roman', serif;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.theme-colorful .editable-area {
+    font-family: 'Comic Sans MS', cursive;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-content.glass-card {
+    background: rgba(30, 30, 30, 0.9);
+    backdrop-filter: blur(20px);
+}
+</style>
+{% endblock %}

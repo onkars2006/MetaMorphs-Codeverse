@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="py-5 mt-5">
+    <div class="container py-5">
+
+        <div class="row justify-content-center mb-5">
+    <div class="col-12 col-md-10 text-center">
+        <div class="glass-card p-4 p-md-5">
+            <div class="d-flex justify-content-center mb-4">
+                <img src="{{ url_for('static', filename='images/banner.png') }}"
+                     alt="Codeverse Hackathon"
+                     class="img-fluid"
+                     style="max-height: 200px; border-radius: 5%;">
+            </div>
+            <h1 class="h2 h-md1 fw-bold text-white mb-3">Project Documentation</h1>
+            <p class="lead text-white-50">StartupIQ - AI Business Planning Platform</p>
+        </div>
+    </div>
+</div>
+
+
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="glass-card p-4 p-lg-5 h-100">
+                    <h2 class="text-white mb-4 border-bottom pb-3"><i class="bi bi-file-earmark-text me-2"></i>Project Details</h2>
+                    
+                    <div class="mb-5">
+                        <h3 class="text-white mb-3">About StartupIQ</h3>
+                        <p class="text-white-50">
+                            StartupIQ is an AI-powered business planning platform that helps transform ideas into executable business plans using machine learning and real-time data analysis.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white mb-3">Key Features</h3>
+                        <ul class="text-white-50">
+                            <li>AI-generated business blueprints</li>
+                            <li>Real-time market insights</li>
+                            <li>Financial and investment forecasting</li>
+                            <li>Pitch-ready documentation</li>
+                            <li>Custom template generator</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="glass-card p-4 p-lg-5 h-100">
+                    <h2 class="text-white mb-4 border-bottom pb-3"><i class="bi bi-trophy me-2"></i>Hackathon Details</h2>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-white mb-3">Codeverse Hackathon</h3>
+                        <p class="text-white-50">
+                            This project was built during Codeverse, a VIT Bhopal Hackathon encouraging student-led innovation and cutting-edge tech applications.
+                        </p>
+                    </div>
+
+                    <div class="mb-5">
+                        <h3 class="text-white mb-3 ">Organized By</h3>
+                        <div class="row justify-content-center g-4">
+                            <div class="col-md-3 text-center">
+                                <img src="{{ url_for('static', filename='images/vit.png') }}" style="background-color: white;" alt="Metaversity" height="50"  class="mb-2">
+                                <p class="mb-0 text-white-50">VIT Bhopal</p>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <img src="{{ url_for('static', filename='images/oscodelogo.png') }}" alt="OS Code" height="50" class="mb-2">
+                                <p class="mb-0 text-white-50" >OS Code</p>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+
+                    <div>
+                        <h3 class="text-white mb-3">Development Team</h3>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ url_for('static', filename='favicon.ico') }}" alt="MetaMorphs" height="50" class="me-3">
+                            <div>
+                                <h4 class="text-white mb-0">MetaMorphs</h4>
+                                <p class="mb-0 text-white-50">VIT Bhopal</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-white-50 mb-1"><strong>Team Members:</strong></p>
+                            <p class="text-white-50">
+                                Soumya Ghosh (Lead), Onkar Somvanshi, Shivam Waghule, Prathviraj Chavan
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card mt-5 p-4 p-lg-5">
+            <h2 class="text-white mb-4"><i class="bi bi-code-slash me-2"></i>Technology Stack</h2>
+            <div class="row g-4 justify-content-center">
+                {% set stack = [
+                    ('bi-filetype-html', 'HTML/CSS', 'text-primary'),
+                    ('bi-bootstrap', 'Bootstrap', 'text-purple'),
+                    ('bi-filetype-js', 'JavaScript', 'text-warning'),
+                    ('bi-filetype-py', 'Python', 'text-info'),
+                    ('bi-server', 'Flask', 'text-light'),
+                    ('bi-fire', 'Firebase DB', 'text-danger'),
+                    ('bi-lightning-charge-fill', 'Gemini API', 'text-success')
+                ] %}
+                
+                {% for icon, label, color in stack %}
+                <div class="col-md-3 col-6 text-center">
+                    <div class="p-3">
+                        <i class="bi {{ icon }} fs-1 {{ color }}"></i>
+                        <h5 class="text-white mt-2">{{ label }}</h5>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-section d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="dashboard-card" data-aos="zoom-in">
+                    <div class="text-center mb-5">
+                        <h2 class="text-white mb-1"><i class="bi bi-shield-lock"></i> Secure Login</h2>
+                        <p class="text-white-50">Access your AI workspace</p>
+                    </div>
+                    
+                    <form method="POST">
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control bg-transparent text-white" 
+                                   name="login_id" required placeholder=" ">
+                            <label class="text-white-50"><i class="bi bi-envelope me-2"></i>Email or Mobile</label>
+                        </div>
+                        
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control bg-transparent text-white" 
+                                   name="password" required placeholder=" ">
+                            <label class="text-white-50"><i class="bi bi-key me-2"></i>Password</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-gradient w-100 py-3 fw-bold">
+                            Unlock Workspace <i class="bi bi-arrow-right"></i>
+                        </button>
+                        
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('auth.register') }}" class="text-white-50 text-decoration-none">
+                                New here? Create free account
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

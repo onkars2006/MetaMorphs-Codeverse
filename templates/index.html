@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-section min-vh-100 d-flex align-items-center position-relative overflow-hidden">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+                <div class="neon-glow-effect">
+                    <h1 class="display-1 fw-bold mb-4">
+                        <span class="text-gradient-primary d-block mb-3">From Concept to</span>
+                        AI-Powered Execution
+                    </h1>
+                </div>
+                <p class="lead text-white-80 mb-5">
+                    Transform raw ideas into investor-ready business plans with our generative AI engine. 
+                    Strategic roadmaps, technical specs, and financial models in minutes.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="#generator" class="btn btn-outline-light btn-lg px-5 py-3">
+                        <i class="bi bi-bar-magic me-2"></i>Launch Your Idea
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-lg px-5 py-3">
+                        <i class="bi bi-bar-chart me-2"></i>See Analytics
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="ai-concept-card p-4 rounded-4">
+                    <div class="code-visualization">
+                        <div class="pseudo-code">
+                            <pre class="m-0"><span class="code-comment">// Transform Concept to Execution</span>
+            <span class="code-keyword">function</span> <span class="code-function">generateBusinessPlan</span>() {
+            <span class="code-var">let</span> concept = <span class="code-function">input</span>(<span class="code-string">"Startup Idea"</span>);
+            
+            <span class="code-function">aiProcess</span>(concept)
+                .<span class="code-function">analyze</span>({
+                <span class="code-property">marketTrends</span>: <span class="code-boolean">true</span>,
+                <span class="code-property">technicalSpecs</span>: <span class="code-boolean">true</span>
+                })
+                .<span class="code-function">generate</span>({
+                <span class="code-property">roadmap</span>: <span class="code-string">"strategic"</span>,
+                <span class="code-property">financialModel</span>: <span class="code-string">"pro"</span>
+                })
+                .<span class="code-function">output</span>(<span class="code-string">"investor-ready"</span>);
+            }</pre>
+                        </div>
+
+                        <div class="ai-process-flow">
+                            <div class="node concept" data-aos="fade">
+                                <i class="bi bi-lightbulb" ></i>
+                                <div class="node-label" style="color: white;">Concept</div>
+                            </div>
+                            <div class="node processing" data-aos="fade" data-aos-delay="100">
+                                <div class="ai-core"></div>
+                            </div>
+                            <div class="node output" data-aos="fade" data-aos-delay="200">
+                                <i class="bi bi-file-earmark-richtext"></i>
+                                <div class="node-label" style="color: white;">Output</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-indicator" data-aos="fade-up" data-aos-delay="500">
+        <div class="mouse"></div>
+    </div>
+</section>
+
+<section id="generator" class="py-7 bg-light-1">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-9">
+                <div class="generator-card p-5 rounded-4 shadow-lg" data-aos="zoom-in">
+                    <div class="text-center mb-6">
+                        <h2 class="display-5 mb-3">
+                            <span class="text-gradient-primary">AI Business Plan Generator</span>
+                            <i class="bi bi-magic ms-3"style="color: blueviolet;"></i>
+                        </h2>
+                        <p class="text-dark-70 fs-5">Start with your concept - we'll handle the complexity</p>
+                    </div>
+
+                    <form id="mainForm" action="/generate" method="POST" enctype="multipart/form-data">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           name="startup_name" 
+                                           required
+                                           style="color: blueviolet;"
+                                           placeholder="Startup Name">
+                                    <label>
+                                        <i class="bi bi-lightning-charge me-2" style="color: blueviolet;"></i>Project Name
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" name="business_model" required>
+                                        <option value="SaaS">SaaS Platform</option>
+                                        <option value="Marketplace">Digital Marketplace</option>
+                                        <option value="E-commerce">E-commerce Venture</option>
+                                        <option value="Subscription">Subscription Service</option>
+                                    </select>
+                                    <label>
+                                        <i class="bi bi-puzzle me-2" style="color: blueviolet;"></i>Business Model
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="input-mode-toggle mb-4">
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="input_method" 
+                                               id="textInput" value="text" checked>
+                                        <label class="btn btn-outline-dark" for="textInput">
+                                            <i class="bi bi-pen me-2"></i>Text Input
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="input_method" 
+                                               id="pdfInput" value="pdf">
+                                        <label class="btn btn-outline-dark" for="pdfInput">
+                                            <i class="bi bi-file-pdf me-2"></i>PDF Upload
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="textInputSection">
+                                    <div class="form-floating">
+                                        <textarea class="form-control auto-resize" 
+                                                  name="startup_idea" 
+                                                  style="min-height: 150px;color: blueviolet;"
+                                                  placeholder="Describe your vision"></textarea>
+                                        <label>
+                                            <i class="bi bi-stars me-2"style="color: blueviolet;"></i>Your Innovation
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="pdfInputSection" class="d-none mt-4">
+                                    <div class="file-upload-card text-center p-4 rounded-3">
+                                        <input type="file" class="d-none" 
+                                               name="pdf_file" id="pdfFile" accept=".pdf">
+                                        <label for="pdfFile" class="btn btn-dark w-100 py-4">
+                                            <i class="bi bi-cloud-upload me-2"></i>Upload PDF
+                                        </label>
+                                        <small class="text-muted mt-2 d-block">
+                                            Maximum 5MB • PDF format only
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-5">
+                                <button type="submit" class="btn btn-gradient-primary w-100 py-4 fw-bold fs-5 text-gradient-primary" >
+                                    <i class="bi bi-cpu me-2" ></i>Generate AI Blueprint
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-7 bg-dark-2">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="interactive-demo rounded-4 overflow-hidden">
+                    <div class="demo-header bg-dark-3 p-3">
+                        <div class="traffic-lights">
+                            <span class="red"></span>
+                            <span class="yellow"></span>
+                            <span class="green"></span>
+                        </div>
+                    </div>
+                    <div class="demo-content p-4">
+                        <div class="terminal-effect">
+                            <pre class="m-0"><code class="language-python">AI.generate_plan(
+    innovation=user_input,
+    market_analysis=True,
+    financial_model='5y_projection',
+    tech_stack='optimal'
+)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left">
+                <h2 class="display-5 text-white mb-4">Precision Engineering for Business Innovation</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon-wrapper text-white bg-gradient-primary">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h4 class=" text-white">Smart Automation</h4>
+                        <p class=" text-white">Automated competitive analysis and market positioning</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon-wrapper text-white bg-gradient-primary">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h4 class="text-white"> Security </h4>
+                        <p class="text-white">256-bit encryption with GDPR compliance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="py-7 bg-gradient-dark">
+    <div class="container">
+        <div class="text-center mb-7" data-aos="fade-up">
+            <h2 class="display-4 mb-3">Strategic Advantage Engine</h2>
+            <p class="text-white-70 fs-5">Enterprise-grade AI capabilities at startup speed</p>
+        </div>
+
+        <div class="row g-4 feature-deck">
+            <div class="col-md-6 col-xl-4" data-aos="flip-up">
+                <div class="feature-card advanced">
+                    <div class="glow-effect"></div>
+                    <div class="icon-wrapper">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <h3 style="margin-top: 10px;">Market Intelligence</h3>
+                    <ul class="feature-list">
+                        <li>Real-time trend analysis</li>
+                        <li>Competitor benchmarking</li>
+                        <li>SWOT automation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4" data-aos="flip-up" data-aos-delay="100">
+                <div class="feature-card advanced">
+                    <div class="glow-effect"></div>
+                    <div class="icon-wrapper">
+                        <i class="bi bi-safe2"></i>
+                    </div>
+                    <h3 style="margin-top: 10px;">Financial Modeling</h3>
+                    <ul class="feature-list">
+                        <li>5-year projections</li>
+                        <li>Scenario planning</li>
+                        <li>Valuation estimates</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4" data-aos="flip-up" data-aos-delay="150">
+                <div class="feature-card advanced">
+                    <div class="glow-effect"></div>
+                    <div class="icon-wrapper">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <h3 style="margin-top: 10px;">Tech Architecture</h3>
+                    <ul class="feature-list">
+                        <li>Cloud infrastructure design</li>
+                        <li>AI stack recommendations</li>
+                        <li>Security frameworks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputSections = {
+        text: document.getElementById('textInputSection'),
+        pdf: document.getElementById('pdfInputSection')
+    };
+
+    document.querySelectorAll('input[name="input_method"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            Object.values(inputSections).forEach(section => 
+                section.classList.add('d-none'));
+            inputSections[radio.value].classList.remove('d-none');
+        });
+    });
+
+    const textarea = document.querySelector('.auto-resize');
+    textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+});
+</script>
+{% endblock %}

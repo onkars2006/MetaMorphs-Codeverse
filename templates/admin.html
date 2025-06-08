@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-5 glass-card p-4 rounded-4">
+        <div>
+            <h2 class="text-gradient-primary mb-1">Admin Console</h2>
+            <p class="text-white-70 mb-0"><i class="bi bi-shield-lock me-2"></i>User Management Portal</p>
+        </div>
+        
+    </div>
+
+    <div class="glass-card rounded-4 overflow-hidden">
+        <div class="bg-dark-2 p-4 border-bottom border-white-10">
+            <h4 class="text-white mb-0"><i class="bi bi-server me-2"></i>User Directory</h4>
+        </div>
+        <div class="bg-dark-2 p-4 text-white-70">
+            <i class="bi bi-people fs-3 me-2"></i>{{ users|length }} Registered Users
+        </div>
+        
+        <div class="p-4">
+            {% if users %}
+            <div class="table-custom">
+                <table class="table table-dark-80 m-0">
+                    <thead>
+                        <tr class="text-gradient-primary">
+                            <th>User</th>
+                            <th>Contact</th>
+                            <th>Registered</th>
+                            <th>Plan Usage</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users if not user.is_admin %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper-sm bg-gradient-primary me-3">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white">{{ user.full_name }}</div>
+                                        <small class="text-white-70">ID: {{ user.id[:8] }}...</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-white">{{ user.email }}</div>
+                                <small class="text-white-70">{{ user.mobile }}</small>
+                            </td>
+                            <td class="text-white-70">
+                                {{ user.created_at.strftime('%Y-%m-%d') }}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress glass-progress me-3">
+                                        <div class="progress-bar bg-gradient-primary" 
+                                             style="width: {{ (user.plan_count/user.plan_limit*100)|round(1) }}%">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="text-white">{{ user.plan_count }}</span>
+                                        <span class="text-white-70">/{{ user.plan_limit }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <form method="POST" 
+                                        action="{{ url_for('admin.update_plan_limit', user_id=user.id) }}" 
+                                        class="d-inline me-2">
+                                        <div class="input-group input-group-glass">
+                                            <input type="number" 
+                                                   name="plan_limit" 
+                                                   value="{{ user.plan_limit }}" 
+                                                   min="0" 
+                                                   class="form-control form-control-sm">
+                                            <button type="submit" 
+                                                    class="btn btn-gradient-primary btn-sm">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    
+                                    <a href="{{ url_for('admin.admin_user_profile', user_id=user.id) }}" 
+                                       class="btn btn-sm btn-outline-light glass-button">
+                                       <i class="bi bi-eye"></i>
+                                    </a>
+                                    
+                                    <form method="POST" 
+                                        action="{{ url_for('admin.admin_delete_user', user_id=user.id) }}" 
+                                        class="d-inline">
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-outline-danger glass-button"
+                                                onclick="return confirm('Permanently delete this account?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-white-70 mb-3"><i class="bi bi-people fs-1"></i></div>
+                                <h5 class="text-white">No user accounts found</h5>
+                                <p class="text-white-70">All users are administrators</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.table-custom {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-dark-80 {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.table-dark-80 th {
+    border-bottom: 2px solid var(--color-accent) !important;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(10px);
+}
+
+.table-dark-80 td, .table-dark-80 th {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.glass-progress {
+    background: rgba(255, 255, 255, 0.1);
+    height: 6px;
+    border-radius: 3px;
+    width: 120px;
+}
+
+.input-group-glass .form-control {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: white;
+    max-width: 80px;
+}
+
+.icon-wrapper-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+}
+</style>
+{% endblock %}

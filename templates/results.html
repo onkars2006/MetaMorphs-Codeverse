@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <div class="text-center mb-5">
+        <h1 class="display-3 fw-bold gradient-text-1 mb-3">
+            {{ plan.form_data.startup_name }}
+        </h1>
+        <div class="d-flex justify-content-center gap-2 mb-4">
+            <span class="badge bg-gradient-1 text-white fs-5 px-4 py-2 rounded-pill">
+                <i class="bi bi-lightbulb me-2"></i>{{ plan.form_data.industry }}
+            </span>
+            <span class="badge bg-gradient-2 text-white fs-5 px-4 py-2 rounded-pill">
+                <i class="bi bi-cash-coin me-2"></i>{{ plan.form_data.business_model }}
+            </span>
+        </div>
+        <p class="lead text-muted fs-4 w-75 mx-auto">
+            "{{ plan.form_data.startup_idea }}"
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg mb-4 animate__animated animate__fadeIn">
+                <div class="card-header bg-gradient-1 text-white py-3">
+                    <h2 class="mb-0"><i class="bi bi-rocket-takeoff me-2"></i>Executive Summary</h2>
+                </div>
+                <div class="card-body content-section">
+                    {{ plan.html_content|safe }}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-gradient-3 text-white py-3">
+                    <h2 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Problem Statement</h2>
+                </div>
+                <div class="card-body content-section">
+                    {{ plan.problem_statement|safe }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-gradient-4 text-white py-3">
+                    <h2 class="mb-0"><i class="bi bi-people-fill me-2"></i>Target Audience</h2>
+                </div>
+                <div class="card-body content-section">
+                    {{ plan.target_audience|safe }}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-gradient-5 text-white py-3">
+                    <h2 class="mb-0"><i class="bi bi-stars me-2"></i>Unique Selling Point</h2>
+                </div>
+                <div class="card-body content-section">
+                    {{ plan.usp|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12 mb-5">
+            <h2 class="text-center gradient-text-2 fw-bold mb-4">
+                <i class="bi bi-robot me-3"></i>AI-Powered Insights
+            </h2>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-lg ai-card-1">
+                <div class="card-header bg-white border-0 pb-0">
+                    <div class="ai-icon-container bg-gradient-1">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3 class="mt-3">Market Analysis</h3>
+                </div>
+                <div class="card-body">
+                    {{ plan.market_research|safe }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-lg ai-card-2">
+                <div class="card-header bg-white border-0 pb-0">
+                    <div class="ai-icon-container bg-gradient-3">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h3 class="mt-3">Tech Stack</h3>
+                </div>
+                <div class="card-body">
+                    {{ plan.tech_stack|safe }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-lg ai-card-3">
+                <div class="card-header bg-white border-0 pb-0">
+                    <div class="ai-icon-container bg-gradient-4">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <h3 class="mt-3">Revenue Models</h3>
+                </div>
+                <div class="card-body">
+                    {{ plan.revenue_models|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.gradient-text-1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-2 {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.bg-gradient-2 { background: linear-gradient(135deg, #ec008c 0%, #fc6767 100%); }
+.bg-gradient-3 { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+.bg-gradient-4 { background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%); }
+.bg-gradient-5 { background: linear-gradient(135deg, #654ea3 0%, #eaafc8 100%); }
+
+.card {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+}
+
+.ai-card-1 .card-body { border-top: 4px solid #667eea; }
+.ai-card-2 .card-body { border-top: 4px solid #11998e; }
+.ai-card-3 .card-body { border-top: 4px solid #ff6b6b; }
+
+.ai-icon-container {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+}
+
+.content-section {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.content-section table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.content-section th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.content-section td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.content-section tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.content-section ul {
+    list-style: none;
+    padding-left: 1.5rem;
+}
+
+.content-section li {
+    position: relative;
+    margin-bottom: 0.8rem;
+    padding-left: 1.5rem;
+}
+
+.content-section li:before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .display-3 {
+        font-size: 2.5rem;
+    }
+}
+</style>
+{% endblock %}

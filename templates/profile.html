@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-5 glass-card p-4 rounded-4">
+        <div>
+            <h2 class="text-gradient-primary mb-0">{{ user.full_name }}</h2>
+            <p class="text-white-70 mb-0">User Profile</p>
+        </div>
+    </div>
+
+    <div class="glass-card rounded-4 mb-5 overflow-hidden">
+        <div class="bg-dark-2 p-4 border-bottom border-white-10">
+            <h4 class="text-white mb-0"><i class="bi bi-person-badge me-2"></i>Account Details</h4>
+        </div>
+        <div class="p-4">
+            <div class="row g-4 text-white-80">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-envelope me-3 fs-5 text-gradient-primary"></i>
+                        <div>
+                            <div class="text-white-70 small">Registered Email</div>
+                            <div class="text-white">{{ user.email }}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-calendar me-3 fs-5 text-gradient-primary"></i>
+                        <div>
+                            <div class="text-white-70 small">Registration Date</div>
+                            <div class="text-white">{{ user.created_at.strftime('%Y-%m-%d ') }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-phone me-3 fs-5 text-gradient-primary"></i>
+                        <div>
+                            <div class="text-white-70 small">Mobile Number</div>
+                            <div class="text-white">{{ user.mobile }}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-files me-3 fs-5 text-gradient-primary"></i>
+                        <div>
+                            <div class="text-white-70 small">Total Plans</div>
+                            <div class="text-white">{{ plans|length }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card rounded-4 overflow-hidden">
+        <div class="bg-dark-2 p-4 border-bottom border-white-10">
+            <h4 class="text-white mb-0"><i class="bi bi-rocket-takeoff me-2"></i>Startup Plans</h4>
+        </div>
+        
+        <div class="p-4">
+            {% if plans %}
+            <div class="table-custom">
+                <table class="table table-dark-80 m-0">
+                    <thead>
+                        <tr class="text-gradient-primary">
+                            <th>Plan Name</th>
+                            <th>Created</th>
+                            <th>Last Updated</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plan in plans %}
+                        <tr>
+                            <td class="text-white">{{ plan.form_data.startup_name }}</td>
+                            <td class="text-white-70">{{ plan.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td class="text-white-70">{{ plan.updated_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <a href="{{ url_for('plans.plan_editor', plan_id=plan.id) }}" 
+                                   class="btn btn-sm btn-gradient-primary" 
+                                   target="_blank">
+                                   <i class="bi bi-file-earmark-richtext"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="text-white-70 mb-3"><i class="bi bi-folder-x fs-1"></i></div>
+                <h5 class="text-white">No startup plans found</h5>
+                <p class="text-white-70">This user hasn't created any plans yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.table-custom {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-dark-80 {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.table-dark-80 th {
+    border-bottom: 2px solid var(--color-accent) !important;
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.table-dark-80 td, .table-dark-80 th {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    padding: 1rem;
+}
+
+.table-dark-80 tr:hover td {
+    background: rgba(139, 92, 246, 0.05);
+}
+</style>
+{% endblock %}
