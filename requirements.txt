@@ -5,7 +5,7 @@ google-generativeai
 python-dotenv
 pdfkit
 gunicorn
-qrcode
+qrcode[pil]
 python-docx
 Werkzeug
 markdown
