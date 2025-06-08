@@ -239,17 +239,13 @@ def generate_full_markdown(plan):
 {plan['revenue_models']}
     """
 def generate_qr_code(plan_id, plan):
-    """Generate QR code for view-only access"""
     try:
-        view_url = url_for('plans.view_plan', 
-                          plan_id=plan_id,
-                          view_key=plan['view_key'],
-                          _external=True)
+        view_url = url_for('plans.view_plan', plan_id=plan_id, view_key=plan['view_key'], _external=True)
         qr = qrcode.make(view_url)
         buffer = BytesIO()
-        qr.save(buffer)
+        qr.save(buffer, format='PNG')
         buffer.seek(0)
-        return send_file(buffer, mimetype='image/png')
+        return send_file(buffer, mimetype='image/png', download_name='plan_qr.png', as_attachment=False)
     except Exception as e:
         current_app.logger.error(f"QR generation failed: {str(e)}")
-        abort(500)
+        return jsonify({"error": "Failed to generate QR code"}), 500
