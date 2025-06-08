@@ -10,6 +10,10 @@ if platform.system() == 'Windows':
 else:
     DEFAULT_WKHTMLTOPDF_PATH = '/usr/local/bin/wkhtmltopdf'
 
+# Check if binary exists, fallback to /usr/bin/wkhtmltopdf if needed
+if not os.path.exists(DEFAULT_WKHTMLTOPDF_PATH) and platform.system() != 'Windows':
+    DEFAULT_WKHTMLTOPDF_PATH = '/usr/bin/wkhtmltopdf'
+
 WKHTMLTOPDF_PATH = os.getenv('WKHTMLTOPDF_PATH', DEFAULT_WKHTMLTOPDF_PATH)
 
 try:
@@ -17,14 +21,7 @@ try:
 except IOError:
     raise SystemExit(f'''
     ❌ wkhtmltopdf not found at: {WKHTMLTOPDF_PATH}
-    Please install wkhtmltopdf and configure the path:
-    1. Download from https://wkhtmltopdf.org/downloads.html
-    2. Install with default settings
-    3. Set environment variable:
-       For Windows:
-         WKHTMLTOPDF_PATH='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe'
-       For Linux/Mac:
-         WKHTMLTOPDF_PATH='/usr/local/bin/wkhtmltopdf'
+    Please install wkhtmltopdf and configure the path.
     ''')
 def validate_mobile(number):
     pattern = r'^[+]?[(]?\d{3}[)]?[-\s.]?\d{3}[-\s.]?\d{4,6}$'
