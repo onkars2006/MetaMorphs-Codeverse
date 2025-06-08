@@ -6,24 +6,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 if platform.system() == 'Windows':
-    DEFAULT_WKHTMLTOPDF_PATH = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    WKHTMLTOPDF_PATH = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
 else:
-    # Use Linux path used by Render or your Linux server
-    DEFAULT_WKHTMLTOPDF_PATH = '/usr/local/bin/wkhtmltopdf'
+    WKHTMLTOPDF_PATH = '/usr/local/bin/wkhtmltopdf'
 
-# Fallback if /usr/local/bin/wkhtmltopdf doesn't exist but /usr/bin/wkhtmltopdf does
-if not os.path.exists(DEFAULT_WKHTMLTOPDF_PATH) and platform.system() != 'Windows':
-    DEFAULT_WKHTMLTOPDF_PATH = '/usr/bin/wkhtmltopdf'
+# fallback if default Linux path doesn't exist but /usr/bin/wkhtmltopdf exists
+if platform.system() != 'Windows' and not os.path.exists(WKHTMLTOPDF_PATH):
+    WKHTMLTOPDF_PATH = '/usr/bin/wkhtmltopdf'
 
-WKHTMLTOPDF_PATH = os.getenv('WKHTMLTOPDF_PATH', DEFAULT_WKHTMLTOPDF_PATH)
-
-try:
-    pdfkit_config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
-except IOError:
-    raise SystemExit(f'''
-❌ wkhtmltopdf not found at: {WKHTMLTOPDF_PATH}
-Please install wkhtmltopdf and configure the path.
-''')
+pdfkit_config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
 def validate_mobile(number):
     pattern = r'^[+]?[(]?\d{3}[)]?[-\s.]?\d{3}[-\s.]?\d{4,6}$'
     return re.match(pattern, number)
