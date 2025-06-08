@@ -240,7 +240,15 @@ def generate_full_markdown(plan):
     """
 def generate_qr_code(plan_id, plan):
     try:
-        view_url = url_for('plans.view_plan', plan_id=plan_id, view_key=plan['view_key'], _external=True)
+        # Handle both dictionary and ORM object
+        if hasattr(plan, 'view_key'):
+            view_key = plan.view_key
+        elif isinstance(plan, dict) and 'view_key' in plan:
+            view_key = plan['view_key']
+        else:
+            raise ValueError("Plan object doesn't have view_key property")
+            
+        view_url = url_for('plans.view_plan', plan_id=plan_id, view_key=view_key, _external=True)
         qr = qrcode.make(view_url)
         buffer = BytesIO()
         qr.save(buffer, format='PNG')
