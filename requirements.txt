@@ -4,6 +4,7 @@ firebase-admin
 google-generativeai
 python-dotenv
 pdfkit
+gunicorn
 qrcode
 python-docx
 Werkzeug
