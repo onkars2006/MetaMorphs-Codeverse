@@ -7,6 +7,7 @@ from io import BytesIO
 import markdown
 import re
 from docx.shared import Pt
+from bs4 import BeautifulSoup
 from utils import WKHTMLTOPDF_PATH
 
 def generate_pdf(plan):
@@ -77,7 +78,6 @@ def generate_pdf(plan):
         <body>
             <div class="header-section">
                 <h1>{plan['form_data']['startup_name']}</h1>
-                <p><strong>Industry:</strong> {plan['form_data']['industry']}</p>
                 <p><strong>Business Model:</strong> {plan['form_data']['business_model']}</p>
             </div>
             
@@ -153,24 +153,65 @@ def sanitize_html(content):
     content = re.sub(r'\s?oninput="autoSave\(\)"', '', content)
     return content
 
+
+def process_html_as_text(doc, html_content):
+    """Parse HTML content and add cleanly to Word document"""
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    for element in soup.find_all(['h1', 'h2', 'h3', 'p', 'ul', 'ol', 'li', 'table']):
+        if element.name.startswith('h'):
+            level = int(element.name[1])
+            doc.add_heading(element.get_text(strip=True), level=level)
+        elif element.name == 'p':
+            doc.add_paragraph(element.get_text(strip=True))
+        elif element.name == 'ul':
+            for li in element.find_all('li'):
+                para = doc.add_paragraph(style='ListBullet')
+                para.add_run(li.get_text(strip=True))
+        elif element.name == 'ol':
+            for li in element.find_all('li'):
+                para = doc.add_paragraph(style='ListNumber')
+                para.add_run(li.get_text(strip=True))
+        elif element.name == 'table':
+            rows = element.find_all('tr')
+            if not rows:
+                continue
+            cols = rows[0].find_all(['td', 'th'])
+            table = doc.add_table(rows=1, cols=len(cols))
+            table.style = 'Table Grid'
+            hdr_cells = table.rows[0].cells
+            for i, col in enumerate(cols):
+                hdr_cells[i].text = col.get_text(strip=True)
+            for row in rows[1:]:
+                cells = row.find_all(['td', 'th'])
+                row_cells = table.add_row().cells
+                for i, cell in enumerate(cells):
+                    row_cells[i].text = cell.get_text(strip=True)
+
+def html_to_clean_text(html):
+    """Remove all HTML tags and decode HTML entities"""
+    soup = BeautifulSoup(html, 'html.parser')
+    return soup.get_text(separator='\n')
 def generate_word_document(plan):
-    """Convert all content to proper Word document"""
+    """Convert all content (markdown + html) to proper Word document"""
     doc = Document()
     style = doc.styles['Normal']
     font = style.font
     font.name = 'Calibri'
     font.size = Pt(11)
 
-    process_markdown(doc, plan['raw_markdown'])
-    
+    # Convert raw_markdown to HTML first
+    raw_html = markdown.markdown(plan['raw_markdown'], extensions=['tables', 'attr_list'])
+    process_html_as_text(doc, raw_html)
+
     doc.add_heading('🔍 Market Research', level=1)
-    process_markdown(doc, plan['market_research'])
-    
+    process_html_as_text(doc, plan['market_research'])
+
     doc.add_heading('⚙️ Tech Stack', level=1)
-    process_markdown(doc, plan['tech_stack'])
-    
+    process_html_as_text(doc, plan['tech_stack'])
+
     doc.add_heading('💰 Revenue Models', level=1)
-    process_markdown(doc, plan['revenue_models'])
+    process_html_as_text(doc, plan['revenue_models'])
 
     buffer = BytesIO()
     doc.save(buffer)
@@ -181,74 +222,23 @@ def generate_word_document(plan):
         download_name='business_plan.docx'
     )
 
-def process_markdown(doc, content):
-    """Improved markdown processor for Word documents"""
-    in_table = False
-    table = None
-    list_level = 0
-
-    for line in content.split('\n'):
-        line = line.strip()
-        
-        if line.startswith('#'):
-            level = min(line.count('#'), 6)
-            text = line.replace('#', '').strip()
-            doc.add_heading(text, level=level-1)
-            continue
-            
-        if re.match(r'^[\-\*\+] ', line):
-            p = doc.add_paragraph(style='ListBullet')
-            p.add_run(line[2:].strip())
-            continue
-            
-        if '|' in line:
-            cols = [c.strip() for c in line.split('|') if c.strip()]
-            if not in_table:
-                table = doc.add_table(rows=1, cols=len(cols))
-                table.style = 'Table Grid'
-                hdr_cells = table.rows[0].cells
-                for i, col in enumerate(cols):
-                    hdr_cells[i].text = col
-                in_table = True
-            else:
-                row_cells = table.add_row().cells
-                for i, col in enumerate(cols):
-                    row_cells[i].text = col
-            continue
-        else:
-            in_table = False
-            
-        if line:
-            doc.add_paragraph(line)
-            
-        list_stack = []
-
-
 def generate_full_markdown(plan):
-    """Combine all sections into final markdown"""
+    """Combine all sections into final clean markdown-like content"""
     return f"""
-{plan['raw_markdown']}
+{html_to_clean_text(plan['raw_markdown'])}
 
 ## 🔍 Market Research
-{plan['market_research']}
+{html_to_clean_text(plan['market_research'])}
 
 ## ⚙️ Tech Stack
-{plan['tech_stack']}
+{html_to_clean_text(plan['tech_stack'])}
 
 ## 💰 Revenue Models
-{plan['revenue_models']}
+{html_to_clean_text(plan['revenue_models'])}
     """
 def generate_qr_code(plan_id, plan):
     try:
-        # Handle both dictionary and ORM object
-        if hasattr(plan, 'view_key'):
-            view_key = plan.view_key
-        elif isinstance(plan, dict) and 'view_key' in plan:
-            view_key = plan['view_key']
-        else:
-            raise ValueError("Plan object doesn't have view_key property")
-            
-        view_url = url_for('plans.view_plan', plan_id=plan_id, view_key=view_key, _external=True)
+        view_url = url_for('plans.view_plan', plan_id=plan_id, view_key=plan['view_key'], _external=True)
         qr = qrcode.make(view_url)
         buffer = BytesIO()
         qr.save(buffer, format='PNG')
