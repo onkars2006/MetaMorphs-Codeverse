@@ -102,7 +102,7 @@ def register():
                 'mobile': mobile,
                 'password': generate_password_hash(password),
                 'is_admin': False,
-                'plan_limit': 1,
+                'plan_limit': 5,
                 'created_at': firestore.SERVER_TIMESTAMP
             }
             
