@@ -6,7 +6,7 @@ from docx import Document
 from io import BytesIO
 import markdown
 import re
-from docx.shared import Pt
+from docx.shared import Pt 
 from bs4 import BeautifulSoup
 from utils import WKHTMLTOPDF_PATH
 
