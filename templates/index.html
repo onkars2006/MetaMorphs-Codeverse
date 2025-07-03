@@ -69,7 +69,30 @@
         <div class="mouse"></div>
     </div>
 </section>
-
+<!-- Login Prompt Modal -->
+                    <div class="modal fade" id="loginPrompt" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header border-0 pb-0">
+                                    <h5 class="modal-title text-dark fw-bold fs-3">
+                                        ① Account Required
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center py-4">
+                                    <p class="fs-5 text-secondary mb-4">Please login or sign up to generate business plans</p>
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-4">
+                                            Login to Continue
+                                        </a>
+                                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg px-4">
+                                            Create Account
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 <section id="generator" class="py-7 bg-light-1">
     <div class="container">
         <div class="row justify-content-center">
@@ -83,25 +106,50 @@
                         <p class="text-dark-70 fs-5">Start with your concept - we'll handle the complexity</p>
                     </div>
 
+                    
+
                     <form id="mainForm" action="/generate" method="POST" enctype="multipart/form-data">
                         <div class="row g-4">
+                            <!-- Project Name -->
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" 
-                                           class="form-control" 
+                                           class="form-control{% if not session.user %} disabled-field{% endif %}" 
                                            name="startup_name" 
                                            required
                                            style="color: blueviolet;"
-                                           placeholder="Startup Name">
+                                           placeholder="Startup Name"
+                                           {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}>
                                     <label>
                                         <i class="bi bi-lightning-charge me-2" style="color: blueviolet;"></i>Project Name
                                     </label>
                                 </div>
                             </div>
-
+                            
+                            <!-- Budget Field -->
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <select class="form-select" name="business_model" required>
+                                    <input type="number" 
+                                           class="form-control{% if not session.user %} disabled-field{% endif %}" 
+                                           name="budget" 
+                                           min="0"
+                                           step="1000"
+                                           placeholder="Budget"
+                                           style="color: blueviolet;"
+                                           {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}>
+                                    <label>
+                                        <i class="bi bi-currency-dollar me-2" style="color: blueviolet;"></i>Budget ($)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Business Model -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select{% if not session.user %} disabled-field{% endif %}" 
+                                            name="business_model" 
+                                            required
+                                            {% if not session.user %}onfocus="showLoginPrompt()" disabled{% endif %}>
                                         <option value="SaaS">SaaS Platform</option>
                                         <option value="Marketplace">Digital Marketplace</option>
                                         <option value="E-commerce">E-commerce Venture</option>
@@ -117,36 +165,43 @@
                                 <div class="input-mode-toggle mb-4">
                                     <div class="btn-group w-100" role="group">
                                         <input type="radio" class="btn-check" name="input_method" 
-                                               id="textInput" value="text" checked>
+                                               id="textInput" value="text" checked
+                                               {% if not session.user %}onfocus="showLoginPrompt()" disabled{% endif %}>
                                         <label class="btn btn-outline-dark" for="textInput">
                                             <i class="bi bi-pen me-2"></i>Text Input
                                         </label>
 
                                         <input type="radio" class="btn-check" name="input_method" 
-                                               id="pdfInput" value="pdf">
+                                               id="pdfInput" value="pdf"
+                                               {% if not session.user %}onfocus="showLoginPrompt()" disabled{% endif %}>
                                         <label class="btn btn-outline-dark" for="pdfInput">
                                             <i class="bi bi-file-pdf me-2"></i>PDF Upload
                                         </label>
                                     </div>
                                 </div>
 
+                                <!-- Text Input -->
                                 <div id="textInputSection">
                                     <div class="form-floating">
-                                        <textarea class="form-control auto-resize" 
+                                        <textarea class="form-control auto-resize{% if not session.user %} disabled-field{% endif %}" 
                                                   name="startup_idea" 
                                                   style="min-height: 150px;color: blueviolet;"
-                                                  placeholder="Describe your vision"></textarea>
+                                                  placeholder="Describe your vision"
+                                                  {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}></textarea>
                                         <label>
                                             <i class="bi bi-stars me-2"style="color: blueviolet;"></i>Your Innovation
                                         </label>
                                     </div>
                                 </div>
 
+                                <!-- PDF Input -->
                                 <div id="pdfInputSection" class="d-none mt-4">
                                     <div class="file-upload-card text-center p-4 rounded-3">
                                         <input type="file" class="d-none" 
-                                               name="pdf_file" id="pdfFile" accept=".pdf">
-                                        <label for="pdfFile" class="btn btn-dark w-100 py-4">
+                                               name="pdf_file" id="pdfFile" accept=".pdf"
+                                               {% if not session.user %}disabled{% endif %}>
+                                        <label for="pdfFile" class="btn btn-dark w-100 py-4{% if not session.user %} disabled-field{% endif %}"
+                                               {% if not session.user %}onclick="showLoginPrompt(); return false;"{% endif %}>
                                             <i class="bi bi-cloud-upload me-2"></i>Upload PDF
                                         </label>
                                         <small class="text-muted mt-2 d-block">
@@ -157,8 +212,10 @@
                             </div>
 
                             <div class="col-12 mt-5">
-                                <button type="submit" class="btn btn-gradient-primary w-100 py-4 fw-bold fs-5 text-gradient-primary" >
-                                    <i class="bi bi-cpu me-2" ></i>Generate AI Blueprint
+                                <button type="submit" class="btn btn-gradient-primary w-100 py-4 fw-bold fs-5 text-gradient-primary{% if not session.user %} disabled{% endif %}" 
+                                        {% if not session.user %}disabled{% endif %}>
+                                    <i class="bi bi-cpu me-2" ></i>
+                                    {% if session.user %}Generate AI Blueprint{% else %}Login to Generate{% endif %}
                                 </button>
                             </div>
                         </div>
@@ -274,6 +331,12 @@
 </section>
 
 <script>
+// Function to show login prompt modal
+function showLoginPrompt() {
+    const modal = new bootstrap.Modal(document.getElementById('loginPrompt'));
+    modal.show();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const inputSections = {
         text: document.getElementById('textInputSection'),
@@ -289,10 +352,60 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const textarea = document.querySelector('.auto-resize');
-    textarea.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = this.scrollHeight + 'px';
-    });
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    }
 });
 </script>
+
+<style>
+/* Style for disabled fields */
+.disabled-field {
+    background-color: #f8f9fa;
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Modal styling to match screenshot */
+#loginPrompt .modal-header {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+#loginPrompt .modal-title {
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: #000;
+}
+
+#loginPrompt .modal-body p {
+    color: #6c757d;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+#loginPrompt .btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+}
+
+#loginPrompt .btn-primary {
+    background-color: #6366f1;
+    border-color: #6366f1;
+}
+
+#loginPrompt .btn-outline-primary {
+    color: #6366f1;
+    border-color: #6366f1;
+}
+
+#loginPrompt .btn-outline-primary:hover {
+    background-color: #6366f1;
+    color: #fff;
+}
+</style>
 {% endblock %}
