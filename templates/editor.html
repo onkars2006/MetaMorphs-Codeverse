@@ -73,7 +73,12 @@
                             <h3 class="mb-0">🔍 AI Market Research</h3>
                         </div>
                         <div class="card-body">
+                            {% if plan.market_research %}
                             {{ plan.market_research|markdown|safe }}
+                        {% else %}
+                            <p class="text-muted">No market research generated yet.</p>
+                        {% endif %}
+
                         </div>
                     </div>
 
@@ -85,7 +90,12 @@
                             <h3 class="mb-0">⚙️ AI Tech Stack</h3>
                         </div>
                         <div class="card-body">
+                            {% if plan.tech_stack %}
                             {{ plan.tech_stack|markdown|safe }}
+                        {% else %}
+                            <p class="text-muted">No tech stack details available.</p>
+                        {% endif %}
+
                         </div>
                     </div>
                     <div class="card glass-card">
@@ -96,7 +106,12 @@
                             <h3 class="mb-0">💰 AI Revenue Models</h3>
                         </div>
                         <div class="card-body">
+                            {% if plan.revenue_models %}
                             {{ plan.revenue_models|markdown|safe }}
+                        {% else %}
+                            <p class="text-muted">No revenue models defined.</p>
+                        {% endif %}
+
                         </div>
                     </div>
                 </div>
@@ -232,6 +247,31 @@ document.addEventListener('DOMContentLoaded', () => {
 {% endif %}
 
 <style>
+    /* Add table styling for editor view */
+.editable-area table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+}
+
+.editable-area th {
+    background-color: rgba(99, 102, 241, 0.5);
+    color: white;
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #444;
+}
+
+.editable-area td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.editable-area tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
 .glass-panel {
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(16px) saturate(180%);
