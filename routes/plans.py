@@ -10,6 +10,7 @@ import traceback
 from io import BytesIO
 import uuid
 from firebase_admin import firestore
+import pdfplumber  # New PDF library
 
 plans_bp = Blueprint('plans', __name__)
 db = get_firestore_db()
@@ -19,12 +20,9 @@ def generate():
     if not session.get('user'):
         flash('Please login or register to create a business plan', 'warning')
         return redirect(url_for('auth.login', next=request.url)) 
-    if not session.get('user'):
-        abort(401)
     
     """Handle plan generation request"""
     try:
-        
         user_id = session['user']['uid']
         
         user_ref = db.collection('users').document(user_id)
@@ -40,13 +38,23 @@ def generate():
         input_method = request.form.get('input_method', 'text')
         idea_type = request.form.get('idea_type', 'custom')
 
+        # Budget validation
+        budget = request.form.get('budget', '0')
+        try:
+            budget = float(budget) if budget else 0
+            if budget < 0:
+                flash('Budget cannot be negative', 'danger')
+                return redirect(url_for('main.home'))
+        except ValueError:
+            flash('Invalid budget value', 'danger')
+            return redirect(url_for('main.home'))
         
         form_data = {
             'startup_name': request.form['startup_name'].strip(),
+            'budget': budget,
             'idea_type': idea_type,
             'business_model': request.form.get('business_model', 'SaaS'),
             'industry': request.form.get('industry', ''),
-            'budget': request.form.get('budget', ''),
             'funding_status': request.form.get('funding_status', ''),
             'term_type': request.form.get('term_type', ''),
             'input_method': input_method,
@@ -64,44 +72,64 @@ def generate():
                 return redirect(url_for('main.home'))
 
             try:
-                pdf_reader = PyPDF2.PdfReader(pdf_file)
+                # Reset file pointer to beginning
+                pdf_file.stream.seek(0)
+                
+                # Use pdfplumber for better text extraction
                 pdf_text = ""
-                for page in pdf_reader.pages:
-                    page_text = page.extract_text()
-                    if page_text:
-                        pdf_text += page_text + "\n"
-
+                with pdfplumber.open(pdf_file.stream) as pdf:
+                    for page in pdf.pages:
+                        page_text = page.extract_text()
+                        if page_text:
+                            pdf_text += page_text + "\n\n"
+                
                 if not pdf_text.strip():
-                    flash('The PDF contains no extractable text', 'danger')
+                    # Fallback: try to extract text by words
+                    pdf_file.stream.seek(0)
+                    with pdfplumber.open(pdf_file.stream) as pdf:
+                        for page in pdf.pages:
+                            words = page.extract_words()
+                            if words:
+                                # Group words into lines based on their positions
+                                lines = {}
+                                for word in words:
+                                    # Use y coordinate to group words into lines
+                                    line_key = int(round(word['top']))
+                                    if line_key not in lines:
+                                        lines[line_key] = []
+                                    lines[line_key].append(word['text'])
+                                
+                                # Sort lines by y coordinate
+                                for key in sorted(lines.keys()):
+                                    pdf_text += " ".join(lines[key]) + "\n"
+                
+                if not pdf_text.strip():
+                    flash('The PDF contains no extractable text. Please try a different PDF or use text input.', 'danger')
                     return redirect(url_for('main.home'))
 
                 form_data['startup_idea'] = pdf_text.strip()
 
             except Exception as e:
+                current_app.logger.error(f"PDF processing error: {str(e)}\n{traceback.format_exc()}")
                 flash(f'Error processing PDF: {str(e)}', 'danger')
                 return redirect(url_for('main.home'))
 
         else:
-            
             form_data['startup_idea'] = request.form['startup_idea'].strip()
 
-        
         if idea_type == 'predefined':
             focus_area = request.form.get('predefined_focus', '').strip()
             form_data['startup_idea'] = f"{form_data['industry']} AI solution focusing on {focus_area}"
 
-        
         html_content, raw_markdown, error = generate_startup_plan(form_data)
         if error:
             flash(f'Error generating plan: {error}', 'danger')
             return redirect(url_for('main.home'))
 
-        
         market_research_raw, _ = generate_market_research(form_data['startup_idea'])
         tech_stack_raw, _ = generate_tech_stack(form_data['startup_idea'])
         revenue_models_raw, _ = generate_revenue_models(form_data['startup_idea'])
 
-        
         plan_id = str(uuid.uuid4())
         plan_data = {
             'user_id': user_id,
@@ -127,10 +155,9 @@ def generate():
         flash(f'Missing required field: {e}', 'danger')
         return redirect(url_for('main.home'))
     except Exception as e:
-        current_app.logger.error(f"Firestore save error: {str(e)}")
-        flash('Error saving business plan', 'danger')
+        current_app.logger.error(f"Plan generation error: {str(e)}\n{traceback.format_exc()}")
+        flash('Error generating business plan', 'danger')
         return redirect(url_for('main.home'))
-    pass
 
 @plans_bp.route('/plan/<plan_id>', methods=['GET', 'POST'])
 def plan_editor(plan_id):
