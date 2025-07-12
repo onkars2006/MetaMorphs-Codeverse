@@ -39,11 +39,23 @@ def generate():
         idea_type = request.form.get('idea_type', 'custom')
 
         # Budget validation
+        startup_name = request.form['startup_name'].strip()
+        if len(startup_name) > 100:
+            flash('Project name must be 100 characters or less', 'danger')
+            return redirect(url_for('main.home'))
+        if not startup_name:
+            flash('Project name is required', 'danger')
+            return redirect(url_for('main.home'))
+
+        # Budget validation
         budget = request.form.get('budget', '0')
         try:
             budget = float(budget) if budget else 0
             if budget < 0:
                 flash('Budget cannot be negative', 'danger')
+                return redirect(url_for('main.home'))
+            if budget > 9999999999:
+                flash('Budget cannot exceed $9,999,999,999', 'danger')
                 return redirect(url_for('main.home'))
         except ValueError:
             flash('Invalid budget value', 'danger')
@@ -114,8 +126,16 @@ def generate():
                 flash(f'Error processing PDF: {str(e)}', 'danger')
                 return redirect(url_for('main.home'))
 
-        else:
-            form_data['startup_idea'] = request.form['startup_idea'].strip()
+        else:  # Text input method
+            startup_idea = request.form['startup_idea'].strip()
+            # Validate description
+            if len(startup_idea) > 500:
+                flash('Description must be 500 characters or less', 'danger')
+                return redirect(url_for('main.home'))
+            if not startup_idea:
+                flash('Description is required', 'danger')
+                return redirect(url_for('main.home'))
+            form_data['startup_idea'] = startup_idea
 
         if idea_type == 'predefined':
             focus_area = request.form.get('predefined_focus', '').strip()
