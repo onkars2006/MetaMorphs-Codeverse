@@ -117,6 +117,7 @@
                                            class="form-control{% if not session.user %} disabled-field{% endif %}" 
                                            name="startup_name" 
                                            required
+                                           maxlength="100"
                                            style="color: blueviolet;"
                                            placeholder="Startup Name"
                                            {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}>
@@ -124,6 +125,7 @@
                                         <i class="bi bi-lightning-charge me-2" style="color: blueviolet;"></i>Project Name
                                     </label>
                                 </div>
+                                <small class="text-muted d-block text-end mt-1">Max 100 characters</small>
                             </div>
                             
                             <!-- Budget Field -->
@@ -133,7 +135,8 @@
                                            class="form-control{% if not session.user %} disabled-field{% endif %}" 
                                            name="budget" 
                                            min="0"
-                                           step="1000"
+                                           max="9999999999"
+                                           step="1"
                                            placeholder="Budget"
                                            style="color: blueviolet;"
                                            {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}>
@@ -141,6 +144,7 @@
                                         <i class="bi bi-currency-dollar me-2" style="color: blueviolet;"></i>Budget ($)
                                     </label>
                                 </div>
+                                <small class="text-muted d-block text-end mt-1">Min $0, max $9,999,999,999</small>
                             </div>
 
                             <!-- Business Model -->
@@ -154,6 +158,21 @@
                                         <option value="Marketplace">Digital Marketplace</option>
                                         <option value="E-commerce">E-commerce Venture</option>
                                         <option value="Subscription">Subscription Service</option>
+                                        <option value="Freemium">Freemium Model</option>
+                                        <option value="Ad-based">Ad-Supported Platform</option>
+                                        <option value="On-demand">On-Demand Service</option>
+                                        <option value="B2B">B2B Service</option>
+                                        <option value="B2C">B2C Product</option>
+                                        <option value="Aggregator">Aggregator Model</option>
+                                        <option value="Licensing">Licensing Model</option>
+                                        <option value="Franchise">Franchise Model</option>
+                                        <option value="Peer-to-peer">Peer-to-Peer Platform</option>
+                                        <option value="Direct Sales">Direct Sales</option>
+                                        <option value="Affiliate">Affiliate Marketing</option>
+                                        <option value="Dropshipping">Dropshipping Business</option>
+                                        <option value="Crowdsourcing">Crowdsourced Platform</option>
+                                        <option value="Non-profit">Non-profit / Social Impact</option>
+                                        <option value="Hybrid">Hybrid Model</option>
                                     </select>
                                     <label>
                                         <i class="bi bi-puzzle me-2" style="color: blueviolet;"></i>Business Model
@@ -162,7 +181,8 @@
                             </div>
 
                             <div class="col-12">
-                            <div class="input-mode-toggle mb-4">
+                            <p class="text-muted mb-2">Max 500 characters</p>
+                                <div class="input-mode-toggle mb-4">
                                 <div class="btn-group w-100" role="group">
                                     <input type="radio" class="btn-check" name="input_method" 
                                            id="textInput" value="text" checked
@@ -182,17 +202,22 @@
 
                             <!-- Text Input -->
                             <div id="textInputSection">
-                                <div class="form-floating">
-                                    <textarea class="form-control auto-resize{% if not session.user %} disabled-field{% endif %}" 
-                                              name="startup_idea" 
-                                              style="min-height: 150px;color: blueviolet;"
-                                              placeholder="Describe your vision"
-                                              {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}></textarea>
-                                    <label>
-                                        <i class="bi bi-stars me-2"style="color: blueviolet;"></i>Your Innovation
-                                    </label>
+                                    <div class="form-floating">
+                                        <textarea class="form-control auto-resize{% if not session.user %} disabled-field{% endif %}" 
+                                                  name="startup_idea" 
+                                                  maxlength="500"
+                                                  style="min-height: 150px;color: blueviolet;"
+                                                  placeholder="Describe your vision"
+                                                  {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}></textarea>
+                                        <label>
+                                            <i class="bi bi-stars me-2"style="color: blueviolet;"></i>Your Innovation
+                                        </label>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-1">
+                                        <small class="text-danger d-none" id="charLimitError">Description exceeds 500 characters</small>
+                                        <small class="text-muted ms-auto" id="charCounter">500</small>
+                                    </div>
                                 </div>
-                            </div>
 
                             <!-- PDF Input -->
                             <div id="pdfInputSection" class="d-none mt-4">
@@ -347,6 +372,43 @@ document.addEventListener('DOMContentLoaded', function() {
         text: document.getElementById('textInputSection'),
         pdf: document.getElementById('pdfInputSection')
     };
+    const charCounter = document.getElementById('charCounter');
+    const charLimitError = document.getElementById('charLimitError');
+
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            // Auto-resize
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+            
+            // Character counter
+            const charCount = this.value.length;
+            charCounter.textContent = `${charCount}/500`;
+            
+            // Validation
+            if (charCount > 500) {
+                charLimitError.classList.remove('d-none');
+                this.classList.add('is-invalid');
+            } else {
+                charLimitError.classList.add('d-none');
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+
+    // Budget validation
+    const budgetInput = document.querySelector('input[name="budget"]');
+    if (budgetInput) {
+        budgetInput.addEventListener('input', function() {
+            if (this.value < 0) {
+                this.value = 0;
+            }
+            if (this.value > 9999999999) {
+                this.value = 9999999999;
+            }
+        });
+    }
+
 
     // PDF file selection handler
     document.getElementById('pdfFile').addEventListener('change', function(e) {
@@ -381,6 +443,17 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+    .is-invalid {
+    border-color: #dc3545 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.is-invalid:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
 /* Style for disabled fields */
 .disabled-field {
     background-color: #f8f9fa;
