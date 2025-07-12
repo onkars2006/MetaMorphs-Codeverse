@@ -162,62 +162,66 @@
                             </div>
 
                             <div class="col-12">
-                                <div class="input-mode-toggle mb-4">
-                                    <div class="btn-group w-100" role="group">
-                                        <input type="radio" class="btn-check" name="input_method" 
-                                               id="textInput" value="text" checked
-                                               {% if not session.user %}onfocus="showLoginPrompt()" disabled{% endif %}>
-                                        <label class="btn btn-outline-dark" for="textInput">
-                                            <i class="bi bi-pen me-2"></i>Text Input
-                                        </label>
+                            <div class="input-mode-toggle mb-4">
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="input_method" 
+                                           id="textInput" value="text" checked
+                                           {% if not session.user %}onfocus="showLoginPrompt()" disabled{% endif %}>
+                                    <label class="btn btn-outline-dark" for="textInput">
+                                        <i class="bi bi-pen me-2"></i>Text Input
+                                    </label>
 
-                                        <input type="radio" class="btn-check" name="input_method" 
-                                               id="pdfInput" value="pdf"
-                                               {% if not session.user %}onfocus="showLoginPrompt()" disabled{% endif %}>
-                                        <label class="btn btn-outline-dark" for="pdfInput">
-                                            <i class="bi bi-file-pdf me-2"></i>PDF Upload
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Text Input -->
-                                <div id="textInputSection">
-                                    <div class="form-floating">
-                                        <textarea class="form-control auto-resize{% if not session.user %} disabled-field{% endif %}" 
-                                                  name="startup_idea" 
-                                                  style="min-height: 150px;color: blueviolet;"
-                                                  placeholder="Describe your vision"
-                                                  {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}></textarea>
-                                        <label>
-                                            <i class="bi bi-stars me-2"style="color: blueviolet;"></i>Your Innovation
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- PDF Input -->
-                                <div id="pdfInputSection" class="d-none mt-4">
-                                    <div class="file-upload-card text-center p-4 rounded-3">
-                                        <input type="file" class="d-none" 
-                                               name="pdf_file" id="pdfFile" accept=".pdf"
-                                               {% if not session.user %}disabled{% endif %}>
-                                        <label for="pdfFile" class="btn btn-dark w-100 py-4{% if not session.user %} disabled-field{% endif %}"
-                                               {% if not session.user %}onclick="showLoginPrompt(); return false;"{% endif %}>
-                                            <i class="bi bi-cloud-upload me-2"></i>Upload PDF
-                                        </label>
-                                        <small class="text-muted mt-2 d-block">
-                                            Maximum 5MB • PDF format only
-                                        </small>
-                                    </div>
+                                    <input type="radio" class="btn-check" name="input_method" 
+                                           id="pdfInput" value="pdf"
+                                           {% if not session.user %}onfocus="showLoginPrompt()" disabled{% endif %}>
+                                    <label class="btn btn-outline-dark" for="pdfInput">
+                                        <i class="bi bi-file-pdf me-2"></i>PDF Upload
+                                    </label>
                                 </div>
                             </div>
+
+                            <!-- Text Input -->
+                            <div id="textInputSection">
+                                <div class="form-floating">
+                                    <textarea class="form-control auto-resize{% if not session.user %} disabled-field{% endif %}" 
+                                              name="startup_idea" 
+                                              style="min-height: 150px;color: blueviolet;"
+                                              placeholder="Describe your vision"
+                                              {% if not session.user %}onfocus="showLoginPrompt()" readonly{% endif %}></textarea>
+                                    <label>
+                                        <i class="bi bi-stars me-2"style="color: blueviolet;"></i>Your Innovation
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- PDF Input -->
+                            <div id="pdfInputSection" class="d-none mt-4">
+                                <div class="file-upload-card text-center p-4 rounded-3">
+                                    <input type="file" class="d-none" 
+                                           name="pdf_file" id="pdfFile" accept=".pdf"
+                                           {% if not session.user %}disabled{% endif %}>
+                                    <label for="pdfFile" class="btn btn-dark w-100 py-4{% if not session.user %} disabled-field{% endif %}"
+                                           {% if not session.user %}onclick="showLoginPrompt(); return false;"{% endif %}>
+                                        <i class="bi bi-cloud-upload me-2"></i>Upload PDF
+                                    </label>
+                                    <div class="file-info mt-2 d-none" id="fileInfo">
+                                        <small class="text-muted d-block" id="fileName"></small>
+                                        <small class="text-muted d-block" id="fileSize"></small>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">
+                                        Maximum 5MB • PDF format only
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
 
                             <div class="col-12 mt-5">
-                                <button type="submit" class="btn btn-gradient-primary w-100 py-4 fw-bold fs-5 text-gradient-primary{% if not session.user %} disabled{% endif %}" 
-                                        {% if not session.user %}disabled{% endif %}>
-                                    <i class="bi bi-cpu me-2" ></i>
-                                    {% if session.user %}Generate AI Blueprint{% else %}Login to Generate{% endif %}
-                                </button>
-                            </div>
+                            <button type="submit" class="btn btn-gradient-primary w-100 py-4 fw-bold fs-5 text-gradient-primary{% if not session.user %} disabled{% endif %}" 
+                                    {% if not session.user %}disabled{% endif %}>
+                                <i class="bi bi-cpu me-2" ></i>
+                                {% if session.user %}Generate AI Blueprint{% else %}Login to Generate{% endif %}
+                            </button>
+                        </div>
                         </div>
                     </form>
                 </div>
@@ -338,10 +342,25 @@ function showLoginPrompt() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+
     const inputSections = {
         text: document.getElementById('textInputSection'),
         pdf: document.getElementById('pdfInputSection')
     };
+
+    // PDF file selection handler
+    document.getElementById('pdfFile').addEventListener('change', function(e) {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            
+            fileName.textContent = `File: ${file.name}`;
+            fileSize.textContent = `Size: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+            fileInfo.classList.remove('d-none');
+        }
+    });
 
     document.querySelectorAll('input[name="input_method"]').forEach(radio => {
         radio.addEventListener('change', () => {
