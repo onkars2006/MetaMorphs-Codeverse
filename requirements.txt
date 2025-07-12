@@ -10,3 +10,4 @@ python-docx
 Werkzeug
 markdown
 bs4
+pdfplumber
