@@ -360,31 +360,26 @@
 </section>
 
 <script>
-// Function to show login prompt modal
-function showLoginPrompt() {
-    const modal = new bootstrap.Modal(document.getElementById('loginPrompt'));
-    modal.show();
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-
     const inputSections = {
         text: document.getElementById('textInputSection'),
         pdf: document.getElementById('pdfInputSection')
     };
+
     const charCounter = document.getElementById('charCounter');
     const charLimitError = document.getElementById('charLimitError');
+    const textarea = document.querySelector('.auto-resize');
 
     if (textarea) {
-        textarea.addEventListener('input', function() {
+        textarea.addEventListener('input', function () {
             // Auto-resize
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
-            
+
             // Character counter
             const charCount = this.value.length;
             charCounter.textContent = `${charCount}/500`;
-            
+
             // Validation
             if (charCount > 500) {
                 charLimitError.classList.remove('d-none');
@@ -399,48 +394,46 @@ document.addEventListener('DOMContentLoaded', function() {
     // Budget validation
     const budgetInput = document.querySelector('input[name="budget"]');
     if (budgetInput) {
-        budgetInput.addEventListener('input', function() {
-            if (this.value < 0) {
-                this.value = 0;
-            }
-            if (this.value > 9999999999) {
-                this.value = 9999999999;
+        budgetInput.addEventListener('input', function () {
+            if (this.value < 0) this.value = 0;
+            if (this.value > 9999999999) this.value = 9999999999;
+        });
+    }
+
+    // PDF file selection handler
+    const pdfFileInput = document.getElementById('pdfFile');
+    if (pdfFileInput) {
+        pdfFileInput.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                const fileInfo = document.getElementById('fileInfo');
+                const fileName = document.getElementById('fileName');
+                const fileSize = document.getElementById('fileSize');
+
+                fileName.textContent = `File: ${file.name}`;
+                fileSize.textContent = `Size: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+                fileInfo.classList.remove('d-none');
             }
         });
     }
 
-
-    // PDF file selection handler
-    document.getElementById('pdfFile').addEventListener('change', function(e) {
-        if (this.files.length > 0) {
-            const file = this.files[0];
-            const fileInfo = document.getElementById('fileInfo');
-            const fileName = document.getElementById('fileName');
-            const fileSize = document.getElementById('fileSize');
-            
-            fileName.textContent = `File: ${file.name}`;
-            fileSize.textContent = `Size: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
-            fileInfo.classList.remove('d-none');
-        }
-    });
-
-    document.querySelectorAll('input[name="input_method"]').forEach(radio => {
+    // Input mode toggle
+    const methodRadios = document.querySelectorAll('input[name="input_method"]');
+    methodRadios.forEach(radio => {
         radio.addEventListener('change', () => {
-            Object.values(inputSections).forEach(section => 
-                section.classList.add('d-none'));
+            Object.values(inputSections).forEach(section => section.classList.add('d-none'));
             inputSections[radio.value].classList.remove('d-none');
         });
     });
-
-    const textarea = document.querySelector('.auto-resize');
-    if (textarea) {
-        textarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
-        });
-    }
 });
+
+// Global function for login prompt
+function showLoginPrompt() {
+    const modal = new bootstrap.Modal(document.getElementById('loginPrompt'));
+    modal.show();
+}
 </script>
+
 
 <style>
     .is-invalid {
